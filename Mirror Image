@@ -1,0 +1,120 @@
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+enum TreeDirection {
+    RIGHT, LEFT
+}
+
+public class TestClass {
+
+    public static void main(String... args) {
+        Scanner scanner = new Scanner(System.in);
+        String[] l1 = scanner.nextLine().trim().split(" ");
+        int n = Integer.parseInt(l1[0]);
+        int q = Integer.parseInt(l1[1]);
+
+        Tree<Integer> tree = new Tree<>(1);
+
+        while (n-- > 1) {
+            String[] input = scanner.nextLine().trim().split(" ");
+            int root = Integer.parseInt(input[0]);
+            int insertValue = Integer.parseInt(input[1]);
+
+            TreeDirection direction = null;
+            switch (input[2]) {
+                case "R":
+                    direction = TreeDirection.RIGHT;
+                    break;
+                case "L":
+                    direction = TreeDirection.LEFT;
+                    break;
+            }
+            tree.add(root, insertValue, direction);
+        }
+
+        while (q-- > 0) {
+            Integer mirror = tree.getMirror(Integer.parseInt(scanner.next()));
+            if (mirror == null) {
+                mirror = -1;
+            }
+            System.out.println(mirror);
+        }
+    }
+}
+
+class Tree<E> {
+
+    private E value;
+    private Tree left;
+    private Tree right;
+
+    public Tree(E root) {
+        this.value = root;
+    }
+
+    public Tree search(E searchValue) {
+        Tree root = this;
+
+        Queue<Tree> q = new LinkedList();
+        q.add(root);
+
+        while (q.size() > 0) {
+            Tree t = q.poll();
+
+            if (searchValue.equals(128)) {
+                System.out.println("fe");
+            }
+
+            if (t.value.equals(searchValue))
+                return t;
+
+            if (t.left != null)
+                q.add(t.left);
+            if (t.right != null)
+                q.add(t.right);
+        }
+        return null;
+    }
+
+    public boolean add(E root, E insertValue, TreeDirection direction) {
+        Tree search = search(root);
+        if (search != null) {
+            switch (direction) {
+                case LEFT:
+                    search.left = new Tree(insertValue);
+                    break;
+                case RIGHT:
+                    search.right = new Tree(insertValue);
+                    break;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public E getMirror(E value) {
+        if (value.equals(this.value))
+            return value;
+        E mirrorVal = getMirrorRec(this.left, this.right, value);
+        return mirrorVal;
+    }
+
+    private E getMirrorRec(Tree left, Tree right, E searchValue) {
+        if (left == null || right == null) {
+            return null;
+        }
+        if (left.value.equals(searchValue)) {
+            return (E) right.value;
+        }
+        if (right.value.equals(searchValue)) {
+            return (E) left.value;
+        }
+        E mirrorVal = getMirrorRec(left.left, right.right, searchValue);
+        if (mirrorVal != null) {
+            return mirrorVal;
+        }
+        return getMirrorRec(left.right, right.left, searchValue);
+    }
+
+}
